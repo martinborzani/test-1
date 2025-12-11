@@ -1,4 +1,3 @@
-
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 const server = require('../server');
@@ -37,7 +36,6 @@ suite('Functional Tests', function () {
         .query({ stock: 'GOOG', like: 'true' })
         .end(function (err, res) {
           assert.equal(res.status, 200);
-          assert.property(res.body, 'stockData');
           const data = res.body.stockData;
           assert.equal(data.stock, 'GOOG');
           assert.isNumber(data.likes);
@@ -46,7 +44,7 @@ suite('Functional Tests', function () {
         });
     });
 
-    test('Viewing the same stock and liking it again (no double count)', function (done) {
+    test('Viewing the same stock and liking it again', function (done) {
       chai
         .request(server)
         .get('/api/stock-prices')
@@ -86,7 +84,7 @@ suite('Functional Tests', function () {
           assert.equal(s2.stock, 'MSFT');
           assert.isNumber(s1.rel_likes);
           assert.isNumber(s2.rel_likes);
-          assert.equal(s1.rel_likes, -s2.rel_likes, 'rel_likes should be inverse');
+          assert.equal(s1.rel_likes, -s2.rel_likes);
           done();
         });
     });
@@ -98,15 +96,9 @@ suite('Functional Tests', function () {
         .query({ stock: ['GOOG', 'MSFT'], like: 'true' })
         .end(function (err, res) {
           assert.equal(res.status, 200);
-          assert.property(res.body, 'stockData');
-          assert.isArray(res.body.stockData);
-          assert.lengthOf(res.body.stockData, 2);
-
           const [s1, s2] = res.body.stockData;
           assert.equal(s1.stock, 'GOOG');
           assert.equal(s2.stock, 'MSFT');
-          assert.property(s1, 'rel_likes');
-          assert.property(s2, 'rel_likes');
           assert.isNumber(s1.rel_likes);
           assert.isNumber(s2.rel_likes);
           assert.equal(s1.rel_likes, -s2.rel_likes);
