@@ -7,10 +7,14 @@ const apiRoutes = require('./routes/api.js');
 
 const app = express();
 
-// Helmet básico para otras protecciones
-app.use(helmet());
+// Helmet SIN CSP (lo desactivamos para que no interfiera)
+app.use(
+  helmet({
+    contentSecurityPolicy: false
+  })
+);
 
-// 👉 CSP MANUAL, EXACTO PARA EL TEST DE freeCodeCamp
+//  CSP MANUAL EXACTO PARA EL TEST DE freeCodeCamp
 app.use(function (req, res, next) {
   res.setHeader(
     'Content-Security-Policy',
