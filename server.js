@@ -2,22 +2,18 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const helmet = require('helmet');
 const apiRoutes = require('./routes/api.js');
 
 const app = express();
 
-// Helmet SIN CSP (lo desactivamos para que no interfiera)
-app.use(
-  helmet({
-    contentSecurityPolicy: false
-  })
-);
+//  NO Helmet → Render + Cloudflare lo duplican
+// app.use(helmet());  // <-- QUITAR
 
-//  CSP MANUAL EXACTO PARA EL TEST DE freeCodeCamp
+//  CSP único y limpio para freeCodeCamp
 app.use(function (req, res, next) {
+  res.removeHeader("Content-Security-Policy"); // <-- nos aseguramos de borrar otros
   res.setHeader(
-    'Content-Security-Policy',
+    "Content-Security-Policy",
     "default-src 'self'; script-src 'self'; style-src 'self';"
   );
   next();
@@ -33,17 +29,14 @@ app.route('/').get(function (req, res) {
   res.sendFile(process.cwd() + '/views/index.html');
 });
 
-// Rutas de la API
 apiRoutes(app);
 
-// 404
 app.use(function (req, res) {
   res.status(404).type('text').send('Not Found');
 });
 
-// Servidor
 const listener = app.listen(process.env.PORT || 3000, function () {
-  console.log('Your app is listening on port ' + listener.address().port);
+  console.log('Listening on port ' + listener.address().port);
 });
 
 module.exports = app;
