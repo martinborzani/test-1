@@ -1,4 +1,3 @@
-
 'use strict';
 
 const fetch = require('node-fetch');
@@ -9,15 +8,12 @@ module.exports = function (app) {
 
   function anonymizeIP(ip) {
     if (!ip) return null;
-    // Express puede mandar "::ffff:127.0.0.1"
     if (ip.includes('::ffff:')) ip = ip.split('::ffff:')[1];
-
     const parts = ip.split('.');
     if (parts.length === 4) {
       parts[3] = '0';
       return parts.join('.');
     }
-    // fallback para IPv6
     return 'ipv6-0';
   }
 
@@ -38,14 +34,12 @@ module.exports = function (app) {
 
   async function fetchStock(symbol) {
     const url = `https://stock-price-checker-proxy.freecodecamp.rocks/v1/stock/${symbol}/quote`;
-
     const response = await fetch(url);
     if (!response.ok) throw new Error('Error fetching stock');
     const data = await response.json();
-
     return {
       stock: data.symbol.toUpperCase(),
-      price: data.latestPrice
+      price: data.latestPrice   // 👈 número, no string
     };
   }
 
@@ -65,29 +59,32 @@ module.exports = function (app) {
       );
 
       if (Array.isArray(stock)) {
-        // Dos acciones
-        const symbol1 = stock[0].toUpperCase();
-        const symbol2 = stock[1].toUpperCase();
+        const s1Sym = stock[0].toUpperCase();
+        const s2Sym = stock[1].toUpperCase();
 
         const [s1, s2] = await Promise.all([
-          fetchStock(symbol1),
-          fetchStock(symbol2)
+          fetchStock(s1Sym),
+          fetchStock(s2Sym)
         ]);
 
-        const likes1 = registerLike(symbol1, ip, likeFlag);
-        const likes2 = registerLike(symbol2, ip, likeFlag);
-
-        const rel1 = likes1 - likes2;
-        const rel2 = likes2 - likes1;
+        const likes1 = registerLike(s1Sym, ip, likeFlag);
+        const likes2 = registerLike(s2Sym, ip, likeFlag);
 
         return res.json({
           stockData: [
-            { stock: s1.stock, price: s1.price, rel_likes: rel1 },
-            { stock: s2.stock, price: s2.price, rel_likes: rel2 }
+            {
+              stock: s1.stock,
+              price: s1.price,
+              rel_likes: likes1 - likes2
+            },
+            {
+              stock: s2.stock,
+              price: s2.price,
+              rel_likes: likes2 - likes1
+            }
           ]
         });
       } else {
-        // Una sola acción
         const symbol = stock.toUpperCase();
         const s = await fetchStock(symbol);
         const likes = registerLike(symbol, ip, likeFlag);
