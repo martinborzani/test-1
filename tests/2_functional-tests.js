@@ -24,7 +24,7 @@ suite('Functional Tests', function () {
           assert.equal(res.body.stockData.stock, 'GOOG');
           assert.property(res.body.stockData, 'price');
           assert.property(res.body.stockData, 'likes');
-          assert.isString(res.body.stockData.price);
+          assert.isNumber(res.body.stockData.price);
           assert.isNumber(res.body.stockData.likes);
           done();
         });
