@@ -45,7 +45,7 @@ module.exports = function (app) {
 
     return {
       stock: data.symbol.toUpperCase(),
-      price: data.latestPrice.toString()
+      price: data.latestPrice
     };
   }
 
