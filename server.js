@@ -6,12 +6,21 @@ const apiRoutes = require('./routes/api.js');
 
 const app = express();
 
-// CSP ÚNICO Y SIMPLE PARA freeCodeCamp
+// CSP ÚNICO Y SIN CACHE PARA freeCodeCamp
 app.use(function (req, res, next) {
+
+  // 🔥 Evitar cache de Cloudflare / Render
+  res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
+  res.setHeader("Pragma", "no-cache");
+  res.setHeader("Expires", "0");
+  res.setHeader("Surrogate-Control", "no-store");
+
+  // 🔥 CSP EXACTO para freeCodeCamp
   res.setHeader(
-    'Content-Security-Policy',
+    "Content-Security-Policy",
     "default-src 'self'; script-src 'self'; style-src 'self'"
   );
+
   next();
 });
 
