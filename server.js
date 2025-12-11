@@ -14,13 +14,11 @@ app.use(
     directives: {
       defaultSrc: ["'self'"],
       scriptSrc: ["'self'"],
-      styleSrc: ["'self'"],
-      imgSrc: ["'self'"],
-      connectSrc: ["'self'"],
-      upgradeInsecureRequests: []
+      styleSrc: ["'self'"]
     }
   })
 );
+
 app.use(helmet.dnsPrefetchControl({ allow: false }));
 app.use(helmet.noSniff());
 app.use(helmet.xssFilter());
